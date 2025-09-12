@@ -1,7 +1,8 @@
 {
-  "dependencies": {
-    "date-fns": "^3.6.0",
-    "react-datepicker": "^7.3.0",
-    "react-router-dom": "^6.26.1"
+  "name": "my-app",
+  "private": true,
+  "scripts": {
+    "start": "npm run start --prefix back-end",
+    "build": "npm run build --prefix front-end"
   }
 }
