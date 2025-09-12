@@ -1,6 +1,6 @@
 const Reservation = require('../models/Reservation');
 const User = require('../models/User');
-const { createSyslog } = require('../controllers/syslogsController');
+const { createSyslog } = require('./SyslogsController');
 
 // Add a new reservation
 const addReservation = async (req, res) => {

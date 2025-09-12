@@ -1,8 +1,6 @@
 const Syslog = require('../models/Syslog');
-const Reservation = require('../models/Reservation');
-const User = require('../models/User');
 
-const createSyslog = async (userId, fullName,controllerName, action) => {
+const createSyslog = async (userId, fullName, controllerName, action) => {
     try {
         const newLog = new Syslog({
             userId,
@@ -26,7 +24,6 @@ const getSyslogs = async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch syslogs', error });
     }
 };
-
 
 module.exports = {
     createSyslog,
