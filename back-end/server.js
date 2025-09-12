@@ -10,8 +10,10 @@ const PORT = process.env.PORT || 5050;
 app.use(express.json());
 app.use(cors());
 
-// Connect to Database
-connectDB();
+// Add a root route to check if server is running
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'API is running!' });
+});
 
 // Routes
 app.use('/meals', require('./routes/meals'));
@@ -24,8 +26,13 @@ app.use((req, res, next) => {
     res.status(404).json({ message: 'Route not found' });
 });
 
-// Start the server
-mongoose.connection.once('open', () => {
-    console.log('Connected to MongoDB');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-});
+// Modified server startup to ensure it starts even with DB issues
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Connect to MongoDB
+connectDB()
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    console.log('Server running without database connection');
+  });

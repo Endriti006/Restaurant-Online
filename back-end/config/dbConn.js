@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.DATABASE_URI);
-        console.log('MongoDB Connected');
+        return Promise.resolve();
     } catch (err) {
-        console.error(err);
-        process.exit(1); 
+        console.error('MongoDB connection error:', err);
+        return Promise.reject(err);
     }
 };
 
