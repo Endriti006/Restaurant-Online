@@ -1,4 +1,6 @@
 const Syslog = require('../models/Syslog');
+const Reservation = require('../models/Reservation');
+const User = require('../models/User');
 
 const createSyslog = async (userId, fullName,controllerName, action) => {
     try {
