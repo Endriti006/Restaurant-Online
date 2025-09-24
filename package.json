@@ -1,0 +1,16 @@
+{
+  "name": "restaurant-online",
+  "version": "1.0.0",
+  "description": "Restaurant Online Backend",
+  "main": "back-end/server.js",
+  "scripts": {
+    "start": "cd back-end && npm start",
+    "build": "cd back-end && npm install",
+    "dev": "cd back-end && npm run dev"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
