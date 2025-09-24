@@ -8,6 +8,10 @@
     "dev": "nodemon server.js",
     "test": "mocha"
   },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
