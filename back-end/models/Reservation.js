@@ -4,11 +4,12 @@ const reservationSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: false          // This must be false, not true
     },
     userFullname: {
         type: String,
-        required: true
+        required: true,
+        default: 'Guest'
     },
     tableNumber: {
         type: Number,
@@ -26,7 +27,9 @@ const reservationSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    specialRequests: String
+    specialRequests: String,
+    contactEmail: String,        // optional guest contact
+    contactPhone: String         // optional guest contact
 });
 
 module.exports = mongoose.model('Reservation', reservationSchema);

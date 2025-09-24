@@ -4,47 +4,69 @@ const { createSyslog } = require('./SyslogsController');
 
 // Add a new reservation
 const addReservation = async (req, res) => {
-    const { userId, date, time, guests, specialRequests } = req.body;
+    const { userId, userFullname, date, time, guests, specialRequests, contactEmail, contactPhone } = req.body;
 
     try {
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        let finalFullname = userFullname;
+        let resolvedUserId = userId || null;
+
+        // If a userId is provided, try to resolve it; otherwise treat as guest
+        if (resolvedUserId) {
+            let user = null;
+            // Basic ObjectId format guard (24 hex chars)
+            if (/^[a-fA-F0-9]{24}$/.test(resolvedUserId)) {
+                user = await User.findById(resolvedUserId);
+            }
+            if (user) {
+                finalFullname = user.fullName;
+            } else {
+                // Fallback to guest if user not found
+                resolvedUserId = null;
+            }
         }
 
-        const userFullname = user.fullName;
+        // Ensure we have a guest name if no valid user
+        if (!resolvedUserId) {
+            if (!finalFullname || !finalFullname.trim()) {
+                return res.status(400).json({ message: 'Guest name is required for anonymous reservation' });
+            }
+        }
+
+        if (!date || !time || !guests) {
+            return res.status(400).json({ message: 'Date, time and guests are required' });
+        }
 
         const reservationCount = await Reservation.countDocuments({ date, time });
-
         if (reservationCount >= 20) {
             return res.status(400).json({ message: 'No more tables available for this timeslot' });
         }
 
         const latestReservation = await Reservation.findOne({ date, time }).sort({ tableNumber: -1 });
-
-        let tableNumber = 1;
-        if (latestReservation) {
-            tableNumber = latestReservation.tableNumber + 1;
-        }
+        const tableNumber = latestReservation ? latestReservation.tableNumber + 1 : 1;
 
         const newReservation = new Reservation({
-            userId,
-            userFullname,
+            userId: resolvedUserId,          // may be null for guests
+            userFullname: finalFullname,
             tableNumber,
             date,
             time,
             guests,
-            specialRequests
+            specialRequests,
+            contactEmail,
+            contactPhone
         });
 
         await newReservation.save();
 
-        // Create a syslog entry
-        await createSyslog(userId, userFullname,'Reservations', 'Created');
+        // Only create syslog for authenticated users
+        if (resolvedUserId) {
+            await createSyslog(resolvedUserId, finalFullname, 'Reservations', 'Created');
+        }
 
-        res.status(201).json({ message: 'Reservation created successfully!', reservation: newReservation });
+        return res.status(201).json({ message: 'Reservation created successfully!', reservation: newReservation });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to create reservation', error });
+        console.error('Reservation creation error:', error);
+        return res.status(500).json({ message: 'Failed to create reservation', error: error.message });
     }
 };
 
